@@ -1,7 +1,5 @@
-#include<stdio.h>
-#include<conio.h>
-#include<stdlib.h>
-#include<process.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define N 5
 
@@ -17,49 +15,65 @@ int empty(q*);
 int full(q*);
 void enqueue(q*, int);
 int dequeue(q*);
+void display(q*);
 
 int main() {
     q queue;
-    int ch;
-    int choice;
+    int ch, c;
     int x, y;
-    
-    //initialize
-    queue.front = queue.rear = N - 1;
+
+    // Initialize queue
+    queue.front = -1;
+    queue.rear = -1;
 
     do {
-        printf("\n 1. Enqueue \n");
-        printf("\n 2. Dequeue \n");
-        printf("\n 3. Exit \n");
+        system("CLS");
+        printf("\n1. Enqueue");
+        printf("\n2. Dequeue");
+        printf("\n3. Display");
+        printf("\n4. Exit");
+        printf("\nEnter your choice: ");
         scanf("%d", &ch);
 
-        switch(ch) {
+        switch (ch) {
             case 1:
-                printf("\n Enter a number to push: \n");
+                system("CLS");
+                printf("\nEnter a number to push: ");
                 scanf("%d", &x);
                 enqueue(&queue, x);
                 break;
 
             case 2:
+                system("CLS");
                 y = dequeue(&queue);
-                printf("\n\n Dequeued item is : %d", y);
+                if (y != -1)
+                    printf("\nDequeued item is: %d\n", y);
                 break;
 
             case 3:
-                exit(1);
+                system("CLS");
+                printf("\nCurrent queue contents:\n");
+                display(&queue);
+                break;
+
+            case 4:
+                exit(0);
                 break;
 
             default:
-                printf("\n Enter 0 for a repeat the task \n");
-                scanf("%d", &choice);
+                system("CLS");
+                printf("\nInvalid choice! Please enter a valid option.\n");
+                break;
         }
-    } while (choice == 0);
+        printf("Enter 0 to return to the main menu \n other number to exit: ");
+        scanf("%d", &c);
+    } while (c == 0);
 
     return 0;
 }
 
 int empty(q *queue) {
-    return (queue->front == queue->rear);
+    return (queue->front == -1);
 }
 
 int full(q *queue) {
@@ -70,7 +84,12 @@ void enqueue(q *queue, int item) {
     if (full(queue)) {
         printf("\nQueue is full, cannot enqueue.\n");
     } else {
-        queue->rear = (queue->rear + 1) % N;
+        if (empty(queue)) {
+            queue->front = 0;
+            queue->rear = 0;
+        } else {
+            queue->rear = (queue->rear + 1) % N;
+        }
         queue->items[queue->rear] = item;
     }
 }
@@ -81,9 +100,27 @@ int dequeue(q *queue) {
         printf("\nQueue is empty, cannot dequeue.\n");
         return -1;
     } else {
-        queue->front = (queue->front + 1) % N;
         item = queue->items[queue->front];
+        if (queue->front == queue->rear) {
+            // Queue becomes empty after dequeue
+            queue->front = -1;
+            queue->rear = -1;
+        } else {
+            queue->front = (queue->front + 1) % N;
+        }
         return item;
+    }
+}
+
+void display(q *queue) {
+    if (empty(queue)) {
+        printf("Queue is empty.\n");
+    } else {
+        int i;
+        for (i = queue->front; i != queue->rear; i = (i + 1) % N) {
+            printf("%d ", queue->items[i]);
+        }
+        printf("%d\n", queue->items[i]); // Print the last element
     }
 }
 
