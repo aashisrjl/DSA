@@ -1,78 +1,68 @@
 #include<stdio.h>
-#include<conio.h>
-#include<math.h>
-#include<string.h>
-#include<process.h>
 #include<ctype.h>
-int precendency(char);
+#include<string.h>
 
-int main(){
-	int i,l,l1;
-	int op_stack_top = -1;
-	int post_stack_top = -1;
-	char infix[100], poststack[100], opstack[100];
-	
-	printf("\n Enter a infix:\n");
-	gets(infix);
-	l= strlen(infix);
-	l1 = l;
-	
-	for(i=0;i<l-1;i++){
-		if(infix[i] == '('){
-			opstack[++op_stack_top] = infix[i];
-			l1++;
-		}
-		else if(isalpha(infix[i])){
-			poststack[++post_stack_top] = infix[i];
-			l1++;
-		}
-		else if(infix[i] == ')'){
-			l1++;
-			
-			while(opstack[op_stack_top] != '('){
-				poststack[++post_stack_top]= opstack[op_stack_top];
-				op_stack_top--;
-			}
-				op_stack_top--;	
-		}
-		else{
-				if(precendency(opstack[	op_stack_top]) >= precendency(infix[i]))
-				{
-					poststack[post_stack_top] = opstack[op_stack_top--];
-					opstack[++op_stack_top]= infix[i];
-				}
-			}
-			while(op_stack_top != -1){
-				poststack[++post_stack_top]= opstack[op_stack_top];
-				op_stack_top--;
-			}
-			// dispalying
-			for(i=0;i<l1;i++){
-				printf(" \nThe post stack is:\n");
-				printf("%c",poststack[i]);
-			}
-		}
-		return 0;
-	}
-	int precendency(char ch){
-		switch(ch){
-			case '$':
-				case '^':
-				return 4;
-				break;
-				
-				case '*':
-					case '/':
-					return 3;
-					break;
-					
-					case '+':
-						case '-':
-						return 2;
-						break;
-						
-						default:
-							return 1;
-		}
-	}
-	
+#define MAX_SIZE 100
+
+int precedence(char);
+
+int main() {
+    int i, l;
+    int op_stack_top = -1;
+    int post_stack_top = -1;
+    char infix[MAX_SIZE], poststack[MAX_SIZE], opstack[MAX_SIZE];
+    
+    printf("\nEnter an infix expression:\n");
+    gets(infix);
+    l = strlen(infix);
+    
+    for (i = 0; i < l; i++) {
+        if (infix[i] == '(') {
+            opstack[++op_stack_top] = infix[i];
+        } else if (isalnum(infix[i])) {
+            poststack[++post_stack_top] = infix[i];
+        } else if (infix[i] == ')') {
+            while (opstack[op_stack_top] != '(') {
+                poststack[++post_stack_top] = opstack[op_stack_top];
+                op_stack_top--;
+            }
+            op_stack_top--;
+        } else {
+            while (op_stack_top != -1 && precedence(opstack[op_stack_top]) >= precedence(infix[i])) {
+                poststack[++post_stack_top] = opstack[op_stack_top--];
+            }
+            opstack[++op_stack_top] = infix[i];
+        }
+    }
+
+    // Pop remaining operators from opstack to poststack
+    while (op_stack_top != -1) {
+        poststack[++post_stack_top] = opstack[op_stack_top--];
+    }
+
+    // Displaying the postfix expression
+    printf("\nThe postfix expression is:\n");
+    for (i = 0; i <= post_stack_top; i++) {
+        printf("%c", poststack[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
+
+int precedence(char ch) {
+    switch (ch) {
+        case '$':
+        case '^':
+            return 4;
+        case '*':
+        case '/':
+            return 3;
+        case '+':
+        case '-':
+            return 2;
+        default:
+            return 1;
+    }
+}
+
