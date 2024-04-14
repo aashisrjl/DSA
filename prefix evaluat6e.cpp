@@ -4,16 +4,18 @@
 #include<stdlib.h>
 #include<math.h>
 
+#define MAX_SIZE 100
+
+int vstack[MAX_SIZE];
+int top = -1;
+
 void push(int);
 int pop();
 
-int vstack[100];
-int top = -1;
-
 void push(int item) {
-    if(top >= 99) {
+    if(top >= MAX_SIZE - 1) {
         printf("\nStack Overflow.");
-        return;
+        exit(1);
     }
     vstack[++top] = item;
 }
@@ -28,23 +30,30 @@ int pop() {
 
 int main() {
     int i, value, res, l, op1, op2;
-    char postfix[100], ch, input[10];
+    char prefix[MAX_SIZE], ch;
 
-    printf("Enter a valid postfix expression: ");
-    fgets(postfix, 100, stdin); // Use fgets instead of gets
-    postfix[strcspn(postfix, "\n")] = 0; // Remove the newline character
-    l = strlen(postfix);
+    printf("Enter a valid prefix expression: ");
+    fgets(prefix, MAX_SIZE, stdin);
+    prefix[strcspn(prefix, "\n")] = 0;
+    l = strlen(prefix);
 
-    for(i = 0; i < l; i++) {
-        if(isalpha(postfix[i])) {
-            printf("Enter value of %c: ", postfix[i]);
+    for(i = l - 1; i >= 0; i--) { // Start from the end of the string
+        if(isalpha(prefix[i])) {
+            printf("Enter value of %c: ", prefix[i]);
             scanf("%d", &value);
-            while(getchar() != '\n'); // Clear the input buffer
             push(value);
+        } else if (isdigit(prefix[i])) {
+            int num = 0;
+            while (isdigit(prefix[i])) {
+                num = num * 10 + (prefix[i] - '0');
+                i--;
+            }
+            i++; // Move back to the last digit of the number
+            push(num);
         } else {
-            ch = postfix[i];
-            op2 = pop();
+            ch = prefix[i];
             op1 = pop();
+            op2 = pop();
             switch(ch) {
                 case '+':
                     push(op1 + op2);
